@@ -19,4 +19,8 @@ public class Car {
     private Long id;
 
     private String name;
+
+    public Car(final String name) {
+        this.name = name;
+    }
 }
