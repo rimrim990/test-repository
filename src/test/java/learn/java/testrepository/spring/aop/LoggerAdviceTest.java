@@ -2,8 +2,6 @@ package learn.java.testrepository.spring.aop;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,12 +46,10 @@ class LoggerAdviceTest {
     }
 
     @Test
-    @DisplayName("private 메서드에도 AOP 가 작용한다 ???")
-    void aop_privateMethod() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    @DisplayName("private 는 상속이 불가능하기 때문에 AOP 가 동작하지 않는다")
+    void aop_privateMethod() {
         final Class<? extends LoggedService> clazz = service.getClass();
-        final Method privateMethod = clazz.getDeclaredMethod("privateMethod");
-        privateMethod.setAccessible(true);
-        privateMethod.invoke(service);
+        assertThrows(NoSuchMethodException.class, () -> clazz.getDeclaredMethod("privateMethod"));
     }
 
     @Test
@@ -71,6 +67,5 @@ class LoggerAdviceTest {
     }
 
     private class Child extends LoggedService {
-
     }
 }

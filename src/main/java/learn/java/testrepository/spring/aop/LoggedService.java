@@ -34,7 +34,7 @@ public class LoggedService {
     }
 
     @Logging
-    String privateMethod() {
+    private String privateMethod() {
         return "private";
     }
 
