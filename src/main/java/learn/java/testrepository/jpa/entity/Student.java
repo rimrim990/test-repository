@@ -1,21 +1,16 @@
 package learn.java.testrepository.jpa.entity;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 
 @Entity
 @Getter
-public class Student {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@DiscriminatorValue("S")
+public class Student extends Person{
 
     private String name;
 
@@ -23,8 +18,9 @@ public class Student {
     @JoinColumn(name = "class_id")
     private Class studentClass;
 
-    public Student(String name) {
+    public Student(String name, String location) {
         this.name = name;
+        this.setLocation(location);
     }
 
     public void setStudentClass(Class studentClass) {

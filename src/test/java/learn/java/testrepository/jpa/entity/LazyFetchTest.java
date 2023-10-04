@@ -34,10 +34,10 @@ public class LazyFetchTest {
     @BeforeEach
     void setUp() {
         List<Student> hiStudents = List.of(
-            new Student("a"), new Student("b"), new Student("c")
+            new Student("a", "1"), new Student("b", "2"), new Student("c", "3")
         );
         List<Student> helloStudents = List.of(
-            new Student("d"), new Student("e"), new Student("f")
+            new Student("d", "4"), new Student("e", "5"), new Student("f", "6")
         );
 
         Class hi = new Class("hi");
@@ -171,5 +171,25 @@ public class LazyFetchTest {
             studentClass.setStudents(allStudentsInClasses.get(studentClass.getId()));
         }
 
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("하이버네이트로 지연 로딩된 객체는 타깃 객체를 상속 받은 프록시이다")
+    void parent() {
+        // given
+        final Student student = studentRepository.findById(1L).get();
+        final Passport passport = new Passport(student, "hello");
+        em.persist(passport);
+        em.clear();
+
+        // when
+        final Passport result = em.find(Passport.class, passport.getId());
+
+        // then
+
+        assertThat(result.getPerson() instanceof Person).isTrue();
+        assertThat(Person.class.isInstance(student)).isTrue();
+        assertThat(result.getPerson().getClass().isInstance(student)).isFalse();
     }
 }
