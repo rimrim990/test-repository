@@ -89,4 +89,65 @@ public class PersistentEntityTest {
         // then
         assertThat(classRepository.findById(classProxy.getId())).hasValue(classProxy);
     }
+
+    @Test
+    @Transactional
+    @DisplayName("JPQL 은 영속성 컨텍스트 캐싱 여부와 관계없이 항상 쿼리를 실행한다")
+    void jpql_query() {
+        // given
+        final Student student = studentRepository.findById(1L).get();
+
+        // when
+        final Student result = studentRepository.findByIdQuery(1L);
+
+        // then
+        assertThat(student == result).isTrue();
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("JPQL 이 실행되면 영속성 컨텍스트 플러시 수행한다")
+    void jpql_flush() {
+        // given
+        final Student student = studentRepository.findById(1L).get();
+        student.setLocation("ddd");
+
+        // when
+        System.out.println("===================");
+        // 영속성 컨텍스트 flush 호출 -> 하이버네이트 기본 설정
+        studentRepository.findByIdQuery(1L);
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("JPQL 로 데이터베이스를 갱신하여도 영속성 컨텍스트에 캐싱된 값이 반환된다")
+    void modifying() {
+        // given
+        studentRepository.findById(1L).get();
+
+        // when
+        // @Modifying(clearAutomatically = false)
+        studentRepository.updateStudentName(1L, "good");
+
+        // then
+        // JPQL 쿼리는 수행되지만 캐싱된 데이터를 우선적으로 가져온다
+        final Student result = studentRepository.findByIdQuery(1L);
+        assertThat(result.getName()).isNotEqualTo("good");
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("JPQL @Modifying 설정으로 DML 수행 후 영속성 컨텍스트를 초기화할 수 있다")
+    void modifying_clearContext() {
+        // given
+        studentRepository.findById(1L).get();
+
+        // when
+        // @Modifying(clearAutomatically = true)
+        studentRepository.updateStudentNameWithClear(1L, "good");
+
+        // then
+        final Student result = studentRepository.findByIdQuery(1L);
+        assertThat(result.getName()).isEqualTo("good");
+    }
 }

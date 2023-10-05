@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.ToString;
-import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Getter
@@ -23,7 +22,7 @@ public class Class {
 
     private String name;
 
-    @BatchSize(size=10)
+    //@BatchSize(size=10)
     @OneToMany(mappedBy = "studentClass", cascade = CascadeType.ALL)
     List<Student> students = new ArrayList<>();
 
